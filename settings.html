@@ -1,0 +1,285 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="freeable-design-standard" content="impeccable-v1">
+  <meta name="sleeksite-template" content="quiet-architecture">
+  <meta name="description" content="Manage currency, display, privacy, and portfolio data settings for Ledger.">
+  <title>Settings — Ledger Portfolio Tracker</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400;6..72,500&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#E8E6E0;--surface:#F7F6F2;--text:#18201E;--muted:#717773;
+      --accent:#315DFF;--secondary:#8B6F55;--rule:#C9C8C2;--negative:#A23B35;--positive:#27634C;
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{margin:0;background:var(--bg);color:var(--text);font-family:"DM Sans",sans-serif;font-size:15px;line-height:1.5}
+    button,input,select{font:inherit}
+    button,a{touch-action:manipulation}
+    a{color:inherit;text-decoration:none}
+    :focus-visible{outline:3px solid var(--accent);outline-offset:3px}
+    ::selection{background:var(--accent);color:#fff}
+    .shell{width:min(100% - 48px,1440px);margin:auto}
+    header{height:78px;border-bottom:1px solid var(--rule);display:flex;align-items:center}
+    nav{width:100%;display:grid;grid-template-columns:1fr auto 1fr;align-items:center}
+    .brand{font-family:"Newsreader",serif;font-size:25px;letter-spacing:-.02em}
+    .navlinks{display:flex;gap:30px;font-size:13px}
+    .navlinks a,.settings{position:relative}
+    .navlinks a:after,.settings:after{content:"";position:absolute;left:0;right:100%;bottom:-5px;height:1px;background:var(--text);transition:right .35s cubic-bezier(.16,1,.3,1)}
+    .navlinks a:hover:after,.settings:hover:after,.settings[aria-current="page"]:after{right:0}
+    .settings{justify-self:end;font-size:13px}
+    main{padding:50px 0 90px}
+    .intro{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(260px,.6fr);gap:50px;align-items:end;padding-bottom:51px;border-bottom:1px solid var(--text)}
+    h1{font-family:"Newsreader",serif;font-size:clamp(58px,7vw,104px);font-weight:400;line-height:.9;letter-spacing:-.045em;margin:0}
+    .intro-copy{max-width:460px;color:var(--muted);margin:0 0 5px auto;font-size:14px}
+    .settings-layout{display:grid;grid-template-columns:230px minmax(0,800px);gap:80px;margin-top:50px}
+    .index{align-self:start;position:sticky;top:28px}
+    .index-title{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin:0 0 16px}
+    .index a{display:flex;justify-content:space-between;gap:16px;padding:10px 0;border-bottom:1px solid var(--rule);font-size:13px}
+    .index a:first-of-type{border-top:1px solid var(--rule)}
+    .index a:hover span:last-child{color:var(--accent)}
+    .index span:last-child{color:var(--muted)}
+    .content{min-width:0}
+    .group{scroll-margin-top:30px;padding-bottom:58px}
+    .group+.group{padding-top:5px}
+    .group-head{display:grid;grid-template-columns:55px 1fr;border-bottom:1px solid var(--text);padding-bottom:13px}
+    .number{font-size:11px;color:var(--muted);letter-spacing:.08em}
+    h2{font-family:"Newsreader",serif;font-size:35px;font-weight:400;line-height:1;margin:0}
+    .row{display:grid;grid-template-columns:minmax(200px,1fr) minmax(220px,300px);gap:36px;align-items:center;padding:22px 0;border-bottom:1px solid var(--rule)}
+    .row-title{font-weight:500;margin:0 0 4px}
+    .row-copy{color:var(--muted);font-size:12px;margin:0;max-width:420px}
+    label.control-label{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}
+    input[type="text"],select{width:100%;min-height:45px;border:1px solid var(--rule);border-radius:0;background:var(--surface);color:var(--text);padding:10px 12px}
+    input:hover,select:hover{border-color:#898e8b}
+    .switch{justify-self:end;position:relative;display:inline-flex;align-items:center;gap:10px;cursor:pointer}
+    .switch input{position:absolute;opacity:0;pointer-events:none}
+    .track{width:44px;height:24px;border:1px solid #949894;background:transparent;position:relative;transition:.2s ease}
+    .track:after{content:"";position:absolute;width:16px;height:16px;left:3px;top:3px;background:var(--muted);transition:transform .25s cubic-bezier(.16,1,.3,1)}
+    .switch input:checked+.track{background:var(--accent);border-color:var(--accent)}
+    .switch input:checked+.track:after{background:#fff;transform:translateX(20px)}
+    .switch input:focus-visible+.track{outline:3px solid var(--accent);outline-offset:3px}
+    .switch-state{font-size:12px;color:var(--muted);min-width:22px}
+    .actions{display:flex;justify-content:flex-end;gap:9px;flex-wrap:wrap}
+    .button{border:1px solid var(--text);background:transparent;color:var(--text);min-height:43px;padding:0 16px;font-weight:600;cursor:pointer}
+    .button:hover{background:var(--text);color:var(--surface)}
+    .button.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+    .button.primary:hover{background:#2047D6;border-color:#2047D6}
+    .button.danger{border-color:var(--negative);color:var(--negative)}
+    .button.danger:hover{background:var(--negative);color:#fff}
+    .button:disabled{opacity:.45;cursor:not-allowed}
+    .savebar{display:flex;align-items:center;justify-content:space-between;gap:24px;padding-top:3px}
+    .status{font-size:12px;color:var(--positive);min-height:20px}
+    .data-note{margin-top:14px;padding:15px 0;border-top:1px solid var(--rule);color:var(--muted);font-size:12px}
+    dialog{width:min(100% - 30px,520px);border:1px solid var(--text);border-radius:0;background:var(--surface);color:var(--text);padding:30px}
+    dialog::backdrop{background:rgba(24,32,30,.45)}
+    dialog h3{font-family:"Newsreader",serif;font-size:30px;font-weight:400;margin:0 0 12px}
+    dialog p{color:var(--muted);margin:0 0 26px}
+    dialog .actions{justify-content:flex-start}
+    footer{border-top:1px solid var(--rule);padding:25px 0 38px;color:var(--muted);font-size:12px}
+    .foot{display:flex;justify-content:space-between}
+    @media(max-width:900px){
+      .shell{width:min(100% - 30px,1440px)}
+      nav{grid-template-columns:1fr auto}.navlinks{display:none}
+      .intro{grid-template-columns:1fr;gap:25px}.intro-copy{margin:0}
+      .settings-layout{grid-template-columns:1fr;gap:46px}.index{position:static}
+      .index nav{display:grid;grid-template-columns:repeat(3,1fr);gap:0}
+      .index a,.index a:first-of-type{border-top:1px solid var(--rule);padding:11px}.index a span:last-child{display:none}
+    }
+    @media(max-width:600px){
+      header{height:66px}main{padding:32px 0 65px}
+      h1{font-size:58px}.intro{padding-bottom:34px}
+      .settings-layout{margin-top:34px}.index nav{grid-template-columns:1fr}
+      .row{grid-template-columns:1fr;gap:15px;padding:20px 0}
+      .switch{justify-self:start}.actions{justify-content:flex-start}
+      .group{padding-bottom:48px}.group-head{grid-template-columns:40px 1fr}
+      .savebar{align-items:flex-start;flex-direction:column}.foot{display:block}.foot span{display:block;margin-top:7px}
+    }
+    @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+  </style>
+</head>
+<body>
+  <header>
+    <nav class="shell" aria-label="Main navigation">
+      <a class="brand" href="index.html" aria-label="Ledger home">Ledger.</a>
+      <div class="navlinks">
+        <a href="index.html">Portfolio</a>
+        <a href="transactions.html">Transactions</a>
+        <a href="reports.html">Reports</a>
+      </div>
+      <a class="settings" href="settings.html" aria-current="page">Settings</a>
+    </nav>
+  </header>
+
+  <main class="shell">
+    <section class="intro" aria-labelledby="page-title">
+      <h1 id="page-title">Settings.</h1>
+      <p class="intro-copy">Set how Ledger displays your portfolio and manage the information stored locally in this browser.</p>
+    </section>
+
+    <div class="settings-layout">
+      <aside class="index" aria-label="Settings sections">
+        <p class="index-title">Settings index</p>
+        <nav>
+          <a href="#portfolio"><span>Portfolio</span><span>01</span></a>
+          <a href="#display"><span>Display</span><span>02</span></a>
+          <a href="#data"><span>Data &amp; privacy</span><span>03</span></a>
+        </nav>
+      </aside>
+
+      <div class="content">
+        <form id="settingsForm">
+          <section class="group" id="portfolio" aria-labelledby="portfolio-title">
+            <header class="group-head"><span class="number">01</span><h2 id="portfolio-title">Portfolio</h2></header>
+            <div class="row">
+              <div><p class="row-title">Portfolio name</p><p class="row-copy">Used in report headings and exported files.</p></div>
+              <div><label class="control-label" for="portfolioName">Portfolio name</label><input id="portfolioName" name="portfolioName" type="text" maxlength="50" value="My portfolio"></div>
+            </div>
+            <div class="row">
+              <div><p class="row-title">Base currency</p><p class="row-copy">Market values and portfolio totals are presented in this currency.</p></div>
+              <div><label class="control-label" for="currency">Base currency</label><select id="currency" name="currency"><option value="GBP">GBP — British pound</option><option value="EUR">EUR — Euro</option><option value="USD">USD — US dollar</option><option value="CHF">CHF — Swiss franc</option></select></div>
+            </div>
+            <div class="row">
+              <div><p class="row-title">Cost basis method</p><p class="row-copy">Determines how gains are estimated when holdings are sold.</p></div>
+              <div><label class="control-label" for="costBasis">Cost basis method</label><select id="costBasis" name="costBasis"><option value="average">Average cost</option><option value="fifo">First in, first out</option><option value="lifo">Last in, first out</option></select></div>
+            </div>
+          </section>
+
+          <section class="group" id="display" aria-labelledby="display-title">
+            <header class="group-head"><span class="number">02</span><h2 id="display-title">Display</h2></header>
+            <div class="row">
+              <div><p class="row-title">Show pence and cents</p><p class="row-copy">Display two decimal places in portfolio totals.</p></div>
+              <label class="switch"><input id="decimals" name="decimals" type="checkbox" checked><span class="track" aria-hidden="true"></span><span class="switch-state">On</span></label>
+            </div>
+            <div class="row">
+              <div><p class="row-title">Include closed positions</p><p class="row-copy">Keep fully sold investments visible in holdings and reports.</p></div>
+              <label class="switch"><input id="closedPositions" name="closedPositions" type="checkbox"><span class="track" aria-hidden="true"></span><span class="switch-state">Off</span></label>
+            </div>
+            <div class="row">
+              <div><p class="row-title">Default report period</p><p class="row-copy">The initial date range shown when opening Reports.</p></div>
+              <div><label class="control-label" for="reportPeriod">Default report period</label><select id="reportPeriod" name="reportPeriod"><option value="ytd">Year to date</option><option value="1y">Past 12 months</option><option value="all">All time</option></select></div>
+            </div>
+          </section>
+
+          <section class="group" id="data" aria-labelledby="data-title">
+            <header class="group-head"><span class="number">03</span><h2 id="data-title">Data &amp; privacy</h2></header>
+            <div class="row">
+              <div><p class="row-title">Export portfolio</p><p class="row-copy">Download your holdings and preferences as a JSON backup.</p></div>
+              <div class="actions"><button class="button" type="button" id="exportButton">Export data</button></div>
+            </div>
+            <div class="row">
+              <div><p class="row-title">Import portfolio</p><p class="row-copy">Restore holdings from a Ledger JSON backup. Existing holdings will be replaced.</p></div>
+              <div class="actions"><input id="importFile" type="file" accept="application/json,.json" hidden><button class="button" type="button" id="importButton">Choose backup</button></div>
+            </div>
+            <div class="row">
+              <div><p class="row-title">Clear local data</p><p class="row-copy">Permanently remove holdings, transactions, and preferences from this browser.</p></div>
+              <div class="actions"><button class="button danger" type="button" id="clearButton">Clear all data</button></div>
+            </div>
+            <p class="data-note">Ledger has no account or cloud connection. Your portfolio remains in this browser unless you export it.</p>
+          </section>
+
+          <div class="savebar">
+            <div class="status" id="status" role="status" aria-live="polite"></div>
+            <button class="button primary" type="submit" id="saveButton">Save settings</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <div class="shell foot"><span>Ledger Portfolio Tracker</span><span>Private by design · Data stays in your browser</span></div>
+  </footer>
+
+  <dialog id="clearDialog" aria-labelledby="dialogTitle">
+    <h3 id="dialogTitle">Clear all local data?</h3>
+    <p>This cannot be undone. Export a backup first if you may need your portfolio later.</p>
+    <div class="actions">
+      <button class="button danger" type="button" id="confirmClear">Clear all data</button>
+      <button class="button" type="button" id="cancelClear">Cancel</button>
+    </div>
+  </dialog>
+
+  <script>
+    const form=document.getElementById("settingsForm");
+    const status=document.getElementById("status");
+    const dialog=document.getElementById("clearDialog");
+    const defaults={portfolioName:"My portfolio",currency:"GBP",costBasis:"average",decimals:true,closedPositions:false,reportPeriod:"ytd"};
+
+    function notify(message,error=false){
+      status.textContent=message;
+      status.style.color=error?"var(--negative)":"var(--positive)";
+      clearTimeout(notify.timer);
+      notify.timer=setTimeout(()=>status.textContent="",4000);
+    }
+    function loadSettings(){
+      let settings=defaults;
+      try{settings={...defaults,...JSON.parse(localStorage.getItem("ledger-settings")||"{}")}}catch(e){}
+      Object.entries(settings).forEach(([key,value])=>{
+        const field=form.elements[key];
+        if(!field)return;
+        if(field.type==="checkbox")field.checked=Boolean(value);else field.value=value;
+      });
+      updateSwitches();
+    }
+    function updateSwitches(){
+      document.querySelectorAll(".switch input").forEach(input=>{
+        input.closest(".switch").querySelector(".switch-state").textContent=input.checked?"On":"Off";
+      });
+    }
+    form.addEventListener("change",updateSwitches);
+    form.addEventListener("submit",e=>{
+      e.preventDefault();
+      const settings={
+        portfolioName:form.portfolioName.value.trim()||defaults.portfolioName,
+        currency:form.currency.value,
+        costBasis:form.costBasis.value,
+        decimals:form.decimals.checked,
+        closedPositions:form.closedPositions.checked,
+        reportPeriod:form.reportPeriod.value
+      };
+      localStorage.setItem("ledger-settings",JSON.stringify(settings));
+      notify("Settings saved in this browser.");
+    });
+    document.getElementById("exportButton").addEventListener("click",()=>{
+      const payload={
+        product:"Ledger Portfolio Tracker",
+        exportedAt:new Date().toISOString(),
+        holdings:JSON.parse(localStorage.getItem("ledger-holdings")||"[]"),
+        transactions:JSON.parse(localStorage.getItem("ledger-transactions")||"[]"),
+        settings:JSON.parse(localStorage.getItem("ledger-settings")||JSON.stringify(defaults))
+      };
+      const url=URL.createObjectURL(new Blob([JSON.stringify(payload,null,2)],{type:"application/json"}));
+      const a=document.createElement("a");
+      a.href=url;a.download="ledger-backup-"+new Date().toISOString().slice(0,10)+".json";a.click();
+      URL.revokeObjectURL(url);notify("Backup exported.");
+    });
+    document.getElementById("importButton").addEventListener("click",()=>document.getElementById("importFile").click());
+    document.getElementById("importFile").addEventListener("change",async e=>{
+      const file=e.target.files[0];if(!file)return;
+      try{
+        const data=JSON.parse(await file.text());
+        if(!data || !Array.isArray(data.holdings))throw new Error();
+        localStorage.setItem("ledger-holdings",JSON.stringify(data.holdings));
+        if(Array.isArray(data.transactions))localStorage.setItem("ledger-transactions",JSON.stringify(data.transactions));
+        if(data.settings)localStorage.setItem("ledger-settings",JSON.stringify(data.settings));
+        loadSettings();notify("Backup imported successfully.");
+      }catch(error){notify("That file is not a valid Ledger backup.",true)}
+      e.target.value="";
+    });
+    document.getElementById("clearButton").addEventListener("click",()=>dialog.showModal());
+    document.getElementById("cancelClear").addEventListener("click",()=>dialog.close());
+    document.getElementById("confirmClear").addEventListener("click",()=>{
+      ["ledger-holdings","ledger-transactions","ledger-settings"].forEach(key=>localStorage.removeItem(key));
+      form.reset();loadSettings();dialog.close();notify("All local Ledger data has been cleared.");
+    });
+    dialog.addEventListener("click",e=>{
+      if(e.target===dialog)dialog.close();
+    });
+    loadSettings();
+  </script>
+</body>
+</html>
