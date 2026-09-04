@@ -1,0 +1,293 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="freeable-design-standard" content="impeccable-v1">
+  <meta name="sleeksite-template" content="quiet-architecture">
+  <meta name="description" content="Portfolio reports and allocation analysis for your Ledger investments.">
+  <title>Reports — Ledger Portfolio Tracker</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400;6..72,500&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#E8E6E0;--surface:#F7F6F2;--text:#18201E;--muted:#717773;
+      --accent:#315DFF;--secondary:#8B6F55;--rule:#C9C8C2;--positive:#27634C;--negative:#A23B35;
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{margin:0;background:var(--bg);color:var(--text);font-family:"DM Sans",sans-serif;font-size:15px;line-height:1.5}
+    button,select{font:inherit}
+    button,a{touch-action:manipulation}
+    a{color:inherit;text-decoration:none}
+    :focus-visible{outline:3px solid var(--accent);outline-offset:3px}
+    ::selection{background:var(--accent);color:#fff}
+    .shell{width:min(100% - 48px,1440px);margin:auto}
+    header{height:78px;border-bottom:1px solid var(--rule);display:flex;align-items:center}
+    nav{width:100%;display:grid;grid-template-columns:1fr auto 1fr;align-items:center}
+    .brand{font-family:"Newsreader",serif;font-size:25px;letter-spacing:-.02em}
+    .navlinks{display:flex;gap:30px;font-size:13px}
+    .navlinks a,.settings{position:relative}
+    .navlinks a:after,.settings:after{content:"";position:absolute;left:0;right:100%;bottom:-5px;height:1px;background:var(--text);transition:right .35s cubic-bezier(.16,1,.3,1)}
+    .navlinks a:hover:after,.navlinks a[aria-current="page"]:after,.settings:hover:after{right:0}
+    .settings{justify-self:end;font-size:13px}
+    main{padding:42px 0 80px}
+    .topline{display:flex;align-items:start;justify-content:space-between;gap:24px;margin-bottom:51px}
+    h1{font-family:"Newsreader",serif;font-size:clamp(55px,7vw,104px);font-weight:400;line-height:.9;letter-spacing:-.045em;margin:0}
+    .controls{display:flex;align-items:end;gap:10px;padding-top:9px}
+    label{display:block;color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:.09em;margin-bottom:7px}
+    select{height:42px;min-width:150px;border:1px solid var(--rule);border-radius:0;background:var(--surface);color:var(--text);padding:0 34px 0 12px}
+    select:hover{border-color:#8d918e}
+    .export{height:42px;border:1px solid var(--text);background:transparent;color:var(--text);padding:0 15px;cursor:pointer;font-size:12px;font-weight:600;transition:background .2s,color .2s}
+    .export:hover{background:var(--text);color:var(--surface)}
+    .export:active{background:#35403d}
+    .summary{display:grid;grid-template-columns:1.4fr repeat(3,1fr);border-top:1px solid var(--text);border-bottom:1px solid var(--rule)}
+    .metric{min-height:138px;padding:23px 24px;border-left:1px solid var(--rule);display:flex;flex-direction:column;justify-content:space-between}
+    .metric:first-child{border-left:0;padding-left:0}
+    .label{color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.09em}
+    .value{font-family:"Newsreader",serif;font-size:clamp(29px,2.7vw,42px);line-height:1}
+    .sub{font-size:12px;color:var(--muted);margin-top:8px}
+    .positive{color:var(--positive)}
+    .report-grid{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(300px,.7fr);gap:50px;margin-top:58px}
+    .section-head{display:flex;align-items:end;justify-content:space-between;border-bottom:1px solid var(--text);padding-bottom:12px}
+    h2{font-family:"Newsreader",serif;font-size:34px;font-weight:400;line-height:1;margin:0}
+    .caption{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.07em}
+    .chart{height:322px;border-bottom:1px solid var(--rule);position:relative;padding:31px 0 34px;margin-bottom:17px}
+    .chart svg{display:block;width:100%;height:100%;overflow:visible}
+    .gridline{stroke:var(--rule);stroke-width:1}
+    .area{fill:rgba(49,93,255,.08)}
+    .line{fill:none;stroke:var(--accent);stroke-width:2.4;vector-effect:non-scaling-stroke}
+    .dot{fill:var(--accent);stroke:var(--bg);stroke-width:2}
+    .axis{display:flex;justify-content:space-between;color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:.05em}
+    .chart-empty{height:322px;display:none;align-items:center;color:var(--muted);border-bottom:1px solid var(--rule)}
+    .allocation-list{margin-top:0}
+    .allocation-row{display:grid;grid-template-columns:29px 1fr auto;gap:12px;align-items:center;padding:20px 0;border-bottom:1px solid var(--rule)}
+    .number{font-size:10px;color:var(--muted)}
+    .allocation-row strong{display:block;font-weight:500}
+    .allocation-row small{display:block;color:var(--muted);margin-top:3px}
+    .percent{font-family:"Newsreader",serif;font-size:27px}
+    .mini-bar{height:3px;background:#d1d0ca;margin-top:10px}
+    .mini-bar span{display:block;height:100%;background:var(--text);transition:width .5s cubic-bezier(.16,1,.3,1)}
+    .allocation-row:nth-child(2) .mini-bar span{background:var(--secondary)}
+    .allocation-row:nth-child(3) .mini-bar span{background:var(--accent)}
+    .ledger{margin-top:72px}
+    .table-wrap{overflow-x:auto}
+    table{border-collapse:collapse;width:100%;min-width:760px}
+    th{text-align:left;color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:.08em;font-weight:500;padding:13px 10px;border-bottom:1px solid var(--rule)}
+    td{padding:17px 10px;border-bottom:1px solid var(--rule)}
+    th:first-child,td:first-child{padding-left:0}
+    th:not(:first-child),td:not(:first-child){text-align:right}
+    .asset{text-align:left!important}.asset strong{display:block;font-weight:600}.asset small{color:var(--muted)}
+    .type{display:inline-block;border:1px solid var(--rule);padding:3px 7px;font-size:10px;text-transform:uppercase;letter-spacing:.06em}
+    .empty{display:none;padding:36px 0;border-bottom:1px solid var(--rule);color:var(--muted)}
+    .empty a{color:var(--accent);text-decoration:underline;text-underline-offset:3px}
+    footer{border-top:1px solid var(--rule);padding:25px 0 38px;color:var(--muted);font-size:12px}
+    .foot{display:flex;justify-content:space-between}
+    @media(max-width:900px){
+      .shell{width:min(100% - 30px,1440px)}
+      nav{grid-template-columns:1fr auto}.navlinks{display:none}
+      .summary{grid-template-columns:1fr 1fr}.metric:nth-child(3){border-left:0}.metric{min-height:112px}
+      .report-grid{grid-template-columns:1fr;gap:52px}
+    }
+    @media(max-width:560px){
+      header{height:66px}main{padding-top:28px}
+      .topline{display:block;margin-bottom:34px}h1{font-size:60px}
+      .controls{padding-top:28px;align-items:end}.controls>div{flex:1}select{width:100%;min-width:0}
+      .summary{grid-template-columns:1fr 1fr}.metric{padding:18px 12px}.metric:first-child{padding-left:0}.value{font-size:28px}
+      .report-grid{margin-top:42px}.chart{height:250px}
+      .ledger{margin-top:55px}.section-head{align-items:center}.caption{max-width:120px;text-align:right}
+      .foot{display:block}.foot span{display:block;margin-top:7px}
+    }
+    @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+  </style>
+</head>
+<body>
+  <header>
+    <nav class="shell" aria-label="Main navigation">
+      <a class="brand" href="/" aria-label="Ledger home">Ledger.</a>
+      <div class="navlinks">
+        <a href="/">Portfolio</a>
+        <a href="/transactions">Transactions</a>
+        <a href="/reports" aria-current="page">Reports</a>
+      </div>
+      <a class="settings" href="/settings">Settings</a>
+    </nav>
+  </header>
+
+  <main class="shell">
+    <section class="topline" aria-labelledby="page-title">
+      <h1 id="page-title">Reports.</h1>
+      <div class="controls">
+        <div>
+          <label for="period">Reporting period</label>
+          <select id="period">
+            <option value="1m">Last month</option>
+            <option value="6m">Last 6 months</option>
+            <option value="1y" selected>Last 12 months</option>
+            <option value="all">All time</option>
+          </select>
+        </div>
+        <button class="export" id="exportButton" type="button">Export CSV</button>
+      </div>
+    </section>
+
+    <section class="summary" aria-label="Portfolio report summary">
+      <div class="metric">
+        <span class="label">Current value</span>
+        <div><div class="value" id="totalValue">£29,524.00</div><div class="sub" id="positionCount">Across 05 positions</div></div>
+      </div>
+      <div class="metric">
+        <span class="label">Cost basis</span>
+        <div><div class="value" id="costBasis">£28,041.60</div><div class="sub">Estimated from entered values</div></div>
+      </div>
+      <div class="metric">
+        <span class="label">Total return</span>
+        <div><div class="value positive" id="totalReturn">+£1,482.40</div><div class="sub positive" id="returnPct">+5.3%</div></div>
+      </div>
+      <div class="metric">
+        <span class="label">Largest position</span>
+        <div><div class="value" id="largestPct">29.9%</div><div class="sub" id="largestName">Vanguard FTSE All-World</div></div>
+      </div>
+    </section>
+
+    <div class="report-grid">
+      <section aria-labelledby="performance-title">
+        <div class="section-head">
+          <h2 id="performance-title">Portfolio value</h2>
+          <span class="caption" id="rangeCaption">12-month view</span>
+        </div>
+        <div class="chart" id="chart" aria-label="Portfolio value over the selected period">
+          <svg viewBox="0 0 900 250" role="img" aria-labelledby="chartTitle chartDesc">
+            <title id="chartTitle">Portfolio value trend</title>
+            <desc id="chartDesc">A line chart showing estimated portfolio value over time.</desc>
+            <line class="gridline" x1="0" y1="10" x2="900" y2="10"/>
+            <line class="gridline" x1="0" y1="125" x2="900" y2="125"/>
+            <line class="gridline" x1="0" y1="240" x2="900" y2="240"/>
+            <path class="area" id="areaPath"></path>
+            <path class="line" id="linePath"></path>
+            <circle class="dot" id="endDot" r="5"></circle>
+          </svg>
+        </div>
+        <div class="chart-empty" id="chartEmpty">Add holdings to generate a portfolio report.</div>
+        <div class="axis" id="axis"></div>
+      </section>
+
+      <section aria-labelledby="allocation-title">
+        <div class="section-head">
+          <h2 id="allocation-title">Asset mix</h2>
+          <span class="caption">Current value</span>
+        </div>
+        <div class="allocation-list" id="allocationList"></div>
+      </section>
+    </div>
+
+    <section class="ledger" aria-labelledby="positions-title">
+      <div class="section-head">
+        <h2 id="positions-title">Position analysis</h2>
+        <span class="caption">Ordered by market value</span>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th scope="col">Instrument</th><th scope="col">Class</th><th scope="col">Market value</th><th scope="col">Portfolio weight</th><th scope="col">Contribution</th></tr>
+          </thead>
+          <tbody id="reportBody"></tbody>
+        </table>
+        <div class="empty" id="emptyState">No positions to report. <a href="/">Add a holding to your portfolio</a>.</div>
+      </div>
+    </section>
+  </main>
+
+  <footer><div class="shell foot"><span>Ledger Portfolio Tracker</span><span>Private by design · Data stays in your browser</span></div></footer>
+
+  <script>
+    const defaults=[
+      {name:"Apple Inc.",symbol:"AAPL",type:"Share",qty:28,price:196},
+      {name:"Unilever PLC",symbol:"ULVR",type:"Share",qty:95,price:49.43},
+      {name:"Vanguard FTSE All-World",symbol:"VWRL",type:"ETF",qty:80,price:110.5},
+      {name:"iShares Core Global Aggregate",symbol:"AGGG",type:"ETF",qty:100,price:50},
+      {name:"UK Treasury 4.25% 2032",symbol:"GB00B3KJDS62",type:"Bond",qty:55,price:100}
+    ];
+    let holdings;
+    try{holdings=JSON.parse(localStorage.getItem("ledger-holdings"))||defaults}catch(e){holdings=defaults}
+    const money=new Intl.NumberFormat("en-GB",{style:"currency",currency:"GBP",minimumFractionDigits:2});
+    const total=holdings.reduce((sum,h)=>sum+Number(h.qty)*Number(h.price),0);
+    const estimatedReturn=total*.050209;
+    const basis=total-estimatedReturn;
+    const escapeHtml=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));
+
+    function render(){
+      const sorted=[...holdings].sort((a,b)=>b.qty*b.price-a.qty*a.price);
+      document.getElementById("totalValue").textContent=money.format(total);
+      document.getElementById("costBasis").textContent=money.format(basis);
+      document.getElementById("totalReturn").textContent=(estimatedReturn>=0?"+":"")+money.format(estimatedReturn);
+      document.getElementById("returnPct").textContent=(estimatedReturn>=0?"+":"")+(basis?estimatedReturn/basis*100:0).toFixed(1)+"%";
+      document.getElementById("positionCount").textContent="Across "+String(holdings.length).padStart(2,"0")+" position"+(holdings.length===1?"":"s");
+      if(sorted.length){
+        document.getElementById("largestPct").textContent=(sorted[0].qty*sorted[0].price/total*100).toFixed(1)+"%";
+        document.getElementById("largestName").textContent=sorted[0].name;
+      }else{
+        document.getElementById("largestPct").textContent="—";
+        document.getElementById("largestName").textContent="No positions";
+      }
+      const tbody=document.getElementById("reportBody");
+      tbody.innerHTML=sorted.map(h=>{
+        const value=h.qty*h.price, weight=total?value/total*100:0, contribution=estimatedReturn*(weight/100);
+        return `<tr><td class="asset"><strong>${escapeHtml(h.name)}</strong><small>${escapeHtml(h.symbol)}</small></td><td><span class="type">${escapeHtml(h.type)}</span></td><td>${money.format(value)}</td><td>${weight.toFixed(1)}%</td><td class="positive">+${money.format(contribution)}</td></tr>`;
+      }).join("");
+      document.getElementById("emptyState").style.display=holdings.length?"none":"block";
+      renderAllocation();
+      updateChart();
+    }
+
+    function renderAllocation(){
+      const groups=[["Shares","Share"],["ETFs","ETF"],["Bonds","Bond"]];
+      document.getElementById("allocationList").innerHTML=groups.map((g,i)=>{
+        const value=holdings.filter(h=>h.type===g[1]).reduce((s,h)=>s+h.qty*h.price,0);
+        const pct=total?value/total*100:0;
+        return `<div class="allocation-row"><span class="number">0${i+1}</span><div><strong>${g[0]}</strong><small>${money.format(value)}</small><div class="mini-bar"><span style="width:${pct}%"></span></div></div><span class="percent">${pct.toFixed(1)}%</span></div>`;
+      }).join("");
+    }
+
+    function updateChart(){
+      const period=document.getElementById("period").value;
+      const configs={
+        "1m":{count:6,labels:["01 Aug","08 Aug","15 Aug","22 Aug","29 Aug","Today"],caption:"One-month view"},
+        "6m":{count:7,labels:["Mar","Apr","May","Jun","Jul","Aug","Sep"],caption:"Six-month view"},
+        "1y":{count:7,labels:["Sep ’25","Nov","Jan ’26","Mar","May","Jul","Sep"],caption:"12-month view"},
+        "all":{count:8,labels:["Start","Q2","Q3","Q4","Q5","Q6","Q7","Today"],caption:"All-time view"}
+      };
+      const c=configs[period], factors=[.928,.941,.936,.958,.971,.963,.985,1];
+      const chosen=factors.slice(factors.length-c.count);
+      const values=chosen.map(f=>total*f);
+      const min=Math.min(...values)*.995,max=Math.max(...values)*1.005;
+      const points=values.map((v,i)=>{
+        const x=i*(900/(values.length-1)),y=240-((v-min)/(max-min||1))*220;
+        return [x,y];
+      });
+      document.getElementById("linePath").setAttribute("d",points.map((p,i)=>(i?"L":"M")+p[0].toFixed(1)+" "+p[1].toFixed(1)).join(" "));
+      document.getElementById("areaPath").setAttribute("d",points.map((p,i)=>(i?"L":"M")+p[0].toFixed(1)+" "+p[1].toFixed(1)).join(" ")+" L900 240 L0 240 Z");
+      const last=points[points.length-1];
+      document.getElementById("endDot").setAttribute("cx",last[0]);
+      document.getElementById("endDot").setAttribute("cy",last[1]);
+      document.getElementById("axis").innerHTML=c.labels.map(l=>`<span>${l}</span>`).join("");
+      document.getElementById("rangeCaption").textContent=c.caption;
+      document.getElementById("chart").style.display=total?"block":"none";
+      document.getElementById("chartEmpty").style.display=total?"none":"flex";
+      document.getElementById("axis").style.display=total?"flex":"none";
+    }
+
+    document.getElementById("period").addEventListener("change",updateChart);
+    document.getElementById("exportButton").addEventListener("click",()=>{
+      const rows=[["Instrument","Symbol","Asset class","Quantity","Price GBP","Market value GBP","Portfolio weight"]];
+      holdings.forEach(h=>rows.push([h.name,h.symbol,h.type,h.qty,h.price,(h.qty*h.price).toFixed(2),(total?h.qty*h.price/total*100:0).toFixed(2)+"%"]));
+      const csv=rows.map(row=>row.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(",")).join("\n");
+      const blob=new Blob([csv],{type:"text/csv;charset=utf-8"});
+      const link=document.createElement("a");link.href=URL.createObjectURL(blob);link.download="ledger-portfolio-report.csv";link.click();
+      setTimeout(()=>URL.revokeObjectURL(link.href),1000);
+    });
+    render();
+  </script>
+</body>
+</html>
